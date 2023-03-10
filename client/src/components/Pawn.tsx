@@ -1,0 +1,90 @@
+import Preact from 'preact'
+import { StateUpdater } from 'preact/hooks';
+import { opposite_colors } from '../Hooks/useSharedGame';
+import { pieces } from '../utils/pieces';
+
+const empty = {
+    type : "empty",
+    canMove : false,
+    color : "",
+    selected : false
+}
+
+type props = {
+    move : () => void,
+    any_selected : () => boolean,
+    clean_up : () => void,
+    pawn_move_areas : () => void,
+    share_game : () => void,
+    x_idx : number,
+    y_idx : number,
+    item : {
+        type : string,
+        selected : boolean,
+        canMove : boolean,
+        color : "white" | "black" | ""
+    },
+    turn : "white" | "black",
+    color : "white" | "black",
+
+}
+
+const Pawn : Preact.FunctionComponent<props> = ({
+    x_idx,
+    y_idx,
+    item,
+    any_selected,
+    clean_up,
+    move,
+    pawn_move_areas,
+    share_game,
+    turn,
+    color
+}) => {
+  return (
+    <div
+    onClick={() => {
+        if(turn !== color) return
+
+        if(item.canMove && any_selected()){
+            move()
+            clean_up()
+            share_game()
+            return
+        }
+
+        if(item.color === color){
+            clean_up()
+            pawn_move_areas()
+            return
+        }
+        clean_up()
+    }}
+    className={`
+    cursor-pointer
+    flex
+    items-center
+    justify-center
+    w-[50px]
+    h-[50px]
+    ${item.canMove ? "border-rose-500 border-2" : ""}
+    ${item.selected ? "border-yellow-500 border-2" : ""}
+    ${(x_idx + y_idx) % 2 === 0 ? "bg-violet-500" : "bg-violet-200"}
+    `}>
+
+        {(() => {
+            const Component = pieces[item.type][item.color];
+            return(
+                <Component
+                className={`
+                w-[45px]
+                `}
+                />
+            )
+        })()}
+
+    </div>
+  )
+}
+
+export default Pawn
