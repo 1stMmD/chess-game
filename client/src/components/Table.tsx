@@ -27,24 +27,22 @@ const pawnBlack = {
 }
 
 type props = {
-    color : "white" | "black",
     sharedGame : piece[][] | typeof empty[][],
     shareGame : (game : piece[][] | typeof empty[][]) => void
-    turn : "white" | "black"
 }
 
 const Table : Preact.FunctionComponent<props> = ({
-    color , 
     sharedGame,
     shareGame,
-    turn
 }) => {
-    const {game , functions} = useGame(color,sharedGame,shareGame)
+    const {game , functions , color , turn} = useGame()
       
     return (
-    <>
     <div
     className={`
+    relative
+    w-[min(80vw,80vh)]
+    aspect-square
     border-[6px]
     overflow-hidden
     rounded-2xl
@@ -198,8 +196,6 @@ const Table : Preact.FunctionComponent<props> = ({
             )
         })}
     </div>
-
-    </>
   )
 }
 

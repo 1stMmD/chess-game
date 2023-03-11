@@ -14,9 +14,10 @@ const Game = () => {
     items-center
     h-screen
     w-full
+    p-2
+    gap-2
     `}>
       <Table
-      color="white"
       shareGame={(game) =>{ shareGame(game) }}
       sharedGame={sharedGame}
       turn={turn}

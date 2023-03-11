@@ -1,5 +1,6 @@
-import { useEffect, useState } from "preact/hooks"
+import { useEffect, useState , useRef } from "preact/hooks"
 import { opposite_colors } from "./useSharedGame"
+import { Socket, io } from "socket.io-client"
 
 type piece_type = "king" | "empty" | "queen" | "rook" | "knight" | "bishop" | "pawn"
 
@@ -32,21 +33,41 @@ const piece = (
     }
 }
 
-export const useGame = (
-    color : "white" | "black",
-    sharedGame : piece[][] | typeof empty[][],
-    shareGame : (game : piece[][] | typeof empty[][]) => void
-) => {
+export const useGame = () => {
     const [game,setGame] = useState<piece[][] | typeof empty[][]>([[]])
+    const [socket,setSocket] = useState<null | Socket>(null)
+    const [roomID , setRoomID] = useState<string | null>(null)
+    const [color,setColor] = useState<"white" | "black">("white")
+    const [turn,setTurn] = useState<"white" | "black">("white")
+    const [loading,setLoading] = useState(true)
 
     useEffect(() => {
-        if(color === "white"){
-        setGame([...sharedGame])
-        return
-        }
-        setGame(sharedGame.map((_,p_idx,p_arr) => [...p_arr[(p_arr.length - p_idx) - 1].map((_,idx,arr) => arr[arr.length - idx - 1])]))
+    const socket = io(import.meta.env.VITE_SOCKET_URL)
 
-    },[sharedGame])
+    socket.on("connect",() => {
+        setSocket(socket)
+
+        socket.emit("room:create","",() => {})
+
+        socket.on("room:get",(room) =>{
+            const color = room.players[socket.id].color
+            setColor(color)
+
+            console.log(room)
+
+            if(!roomID) setRoomID(room.ID)
+
+            setTurn(room.turn)
+
+            if(color === "white"){
+            setGame([...room.game])
+            return
+            }
+            setGame([...room.game].map((_,p_idx,p_arr) => [...p_arr[(p_arr.length - p_idx) - 1].map((_,idx,arr) => arr[arr.length - idx - 1])]))
+        })
+    })
+    },[])
+    
 
     const any_selected = () => {
         return game.some(i => i.some(v => v.selected))
@@ -337,22 +358,29 @@ export const useGame = (
     }
     
     const share_game = () => {
+        let array;
         if(color === "white"){
-            shareGame(game.map((i) => [...i.map((v) => { return {...v , selected : false , canMove : false}})]))
-            return
+            array = game.map((i) => [...i.map((v) => { return {...v , selected : false , canMove : false}})])
+        } else{
+            array = game.map(
+                (_,p_idx,p_arr) => 
+                [...p_arr[(p_arr.length - p_idx) - 1].map((_,idx,arr) => 
+                    arr[arr.length - idx - 1])]
+                    ).map((i) => [...i.map((v) => { return {...v , selected : false , canMove : false}})])
         }
-        shareGame(game.map(
-            (_,p_idx,p_arr) => 
-            [...p_arr[(p_arr.length - p_idx) - 1].map((_,idx,arr) => 
-                arr[arr.length - idx - 1])]
-                ).map((i) => [...i.map((v) => { return {...v , selected : false , canMove : false}})])
-            )
+        socket?.emit("room:update",{
+            ID : roomID,
+            game : array
+        })
+        
 
     }
 
 
     return {
         game,
+        color,
+        turn,
         functions : {
             any_selected,
             move,

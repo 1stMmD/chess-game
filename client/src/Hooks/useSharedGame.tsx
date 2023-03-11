@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks"
-
+import { io } from "socket.io-client"
 type piece_type = "king" | "empty" | "queen" | "rook" | "knight" | "bishop" | "pawn"
 
 export type piece = {
@@ -20,7 +20,7 @@ export const empty = {
 
 const piece = (
     type : piece_type,
-    color : "white" | "black"
+    color : "white" | "black" | ""
 ) => {
     return{
         type,
@@ -50,7 +50,7 @@ export const useSharedGame = () => {
         [piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white")],
         [piece("rook","white"),piece("knight","white"),piece("bishop","white"),piece("king","white"),piece("queen","white"),piece("bishop","white"),piece("knight","white"),piece("rook","white")],
     ])
-
+    
     const [turn , setTurn] = useState<"white"|"black">("white")
 
     useEffect(() => {

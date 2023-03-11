@@ -49,8 +49,8 @@ const Empty : Preact.FunctionComponent<props> = ({
     flex
     items-center
     justify-center
-    w-[50px]
-    h-[50px]
+    w-[min(calc(100%_/_8),calc(80vh_/_8))]
+    aspect-square
     ${item.canMove ? "border-green-500 border-2" : ""}
     ${item.selected ? "border-yellow-500 border-2" : ""}
     ${(x_idx + y_idx) % 2 === 0 ? "bg-violet-500" : "bg-violet-200"}
