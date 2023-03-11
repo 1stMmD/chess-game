@@ -43,7 +43,7 @@ const Play = () => {
             bg-neutral-100
             `}/>
 
-            {players?.filter(player => player.color !== color)[0].username}
+            {players?.filter(player => player.color !== color)[0]?.username}
           </span>
 
           <Table
@@ -74,7 +74,7 @@ const Play = () => {
             bg-neutral-100
             `}/>
 
-            {players?.filter(player => player.color === color)[0].username}
+            {players?.filter(player => player.color === color)[0]?.username}
           </span>
         </>
         :
