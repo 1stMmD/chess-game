@@ -1,6 +1,5 @@
 import Preact from 'preact'
 import { StateUpdater } from 'preact/hooks';
-import { opposite_colors } from '../Hooks/useSharedGame';
 import { pieces } from '../utils/pieces';
 
 const empty = {
@@ -69,7 +68,7 @@ const Pawn : Preact.FunctionComponent<props> = ({
     aspect-square
     ${item.canMove ? "border-rose-500 border-2" : ""}
     ${item.selected ? "border-yellow-500 border-2" : ""}
-    ${(x_idx + y_idx) % 2 === 0 ? "bg-violet-500" : "bg-violet-200"}
+    ${(x_idx + y_idx) % 2 === 0 ? "bg-violet-200" :  "bg-violet-500"}
     `}>
 
         {(() => {

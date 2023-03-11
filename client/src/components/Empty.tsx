@@ -53,7 +53,7 @@ const Empty : Preact.FunctionComponent<props> = ({
     aspect-square
     ${item.canMove ? "border-green-500 border-2" : ""}
     ${item.selected ? "border-yellow-500 border-2" : ""}
-    ${(x_idx + y_idx) % 2 === 0 ? "bg-violet-500" : "bg-violet-200"}
+    ${(x_idx + y_idx) % 2 === 0 ? "bg-violet-200" : "bg-violet-500"}
     `}>
 
     </div>

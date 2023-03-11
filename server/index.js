@@ -2,7 +2,7 @@ const dotenv = require("dotenv")
 const { createServer } = require("http");
 const express = require("express");
 const { Server } = require("socket.io");
-const gameHandler  = require("./gameHandler");
+const gameHandler  = require("./src/gameHandler");
 const { disconnect } = require("process");
 
 dotenv.config()
@@ -19,19 +19,44 @@ const io = new Server(server,{
 
 const rooms = []
 
+const users = []
+
+io.use((socket,next) => {
+    const {username , password} = socket.handshake.auth;
+    
+    const idx = users.findIndex((user) => user.name === username);
+
+    if(idx >= 0){
+        const user = users[idx]
+        if(user.password === password){
+            socket.data = {...user}
+            next()
+        }
+        next(new Error("wrong password bro!"))
+    } else {
+        const user = {
+            username,
+            password
+        }
+        users.push(user)
+        socket.data = {...user}
+        next()
+    }
+})
+
 io.on("connection",(socket) => {
-    console.log(socket.id + " connected")
+    console.log(socket.data.username + " connected")
+
+    // userHandler(io,socket,users)
 
     gameHandler(io,socket,rooms)
     
     socket.on("disconnect",() => {
-        console.log(socket.id + " disconnected")
+        console.log(socket.data.username + " disconnected")
+        const idx = rooms.findIndex(item => Object.keys(item.players).some(key => key === socket.id))
+        rooms.splice(idx,1)
     })
-})
-
-io.on("disconnect", socket => {
-    const idx = rooms.findIndex(item => Object.keys(item.players).some(key => key === socket.id))
-    rooms.splice(idx,1)
+    
 })
 
 const port = process.env.PORT ?? 2020

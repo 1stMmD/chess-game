@@ -1,28 +1,47 @@
 import { useState } from 'preact/hooks'
 import Table from './components/Table'
-import { useSharedGame } from './Hooks/useSharedGame'
-
+import { socket, socket_error } from './signals/SocketSignal'
+import { 
+  BrowserRouter as Router,
+  Routes,
+  Route
+} from 'react-router-dom'
+import AuthProtected from './signals/AuthProtected'
+import Play from './pages/Play'
+import Auth from './pages/Auth'
+import Home from './pages/Home'
 
 const Game = () => {
-  const { sharedGame , shareGame , turn } = useSharedGame()
+
+  if(!!socket_error.value) return(
+    <div>
+      Error
+    </div>
+  )
 
   return (
-    <div
-    className={`
-    flex
-    justify-evenly
-    items-center
-    h-screen
-    w-full
-    p-2
-    gap-2
-    `}>
-      <Table
-      shareGame={(game) =>{ shareGame(game) }}
-      sharedGame={sharedGame}
-      turn={turn}
-      />
-    </div>
+    <Router>
+      <div
+      className={`
+      flex
+      justify-evenly
+      items-center
+      h-screen
+      w-full
+      p-2
+      gap-2
+      `}>
+        <Routes>
+
+          <Route path="/play" element={<AuthProtected><Play/></AuthProtected>} />
+
+          <Route path="/" element={<AuthProtected><Home/></AuthProtected>} />
+          
+          <Route path="/auth" element={<Auth/>} />
+
+        </Routes>
+      </div>
+    </Router>
   )
 }
 

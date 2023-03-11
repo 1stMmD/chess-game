@@ -2,8 +2,8 @@ import Preact from 'preact'
 import { useState } from 'preact/hooks'
 import Pawn from './Pawn'
 import Empty from './Empty'
-import { useGame } from '../Hooks/useGame'
-import type { piece } from '../Hooks/useSharedGame'
+import { useGame } from '../hooks/useGame'
+import { piece } from '../utils/types'
 
 export const empty = {
     type : "empty",
@@ -27,21 +27,31 @@ const pawnBlack = {
 }
 
 type props = {
-    sharedGame : piece[][] | typeof empty[][],
-    shareGame : (game : piece[][] | typeof empty[][]) => void
+    game : piece[][],
+    functions : {
+        any_selected: () => boolean;
+        move: (x_idx: number, y_idx: number) => void;
+        clean_up: () => void;
+        pawn_move_areas: (x_idx: number, y_idx: number) => void;
+        king_move_areas: (x_idx: number, y_idx: number) => void;
+        rook_move_areas: (x_idx: number, y_idx: number) => void;
+        bishop_move_areas: (x_idx: number, y_idx: number) => void;
+        knight_move_areas: (x_idx: number, y_idx: number) => void;
+        share_game: () => void;
+    },
+    color : "white" | "black",
+    turn : "white" | "black",
 }
 
 const Table : Preact.FunctionComponent<props> = ({
-    sharedGame,
-    shareGame,
+    game , functions , color , turn
 }) => {
-    const {game , functions , color , turn} = useGame()
       
     return (
     <div
     className={`
     relative
-    w-[min(80vw,80vh)]
+    w-[min(80vw,70vh)]
     aspect-square
     border-[6px]
     overflow-hidden

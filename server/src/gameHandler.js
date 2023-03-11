@@ -31,8 +31,9 @@ const gameHandler = (
 
         if(index >= 0){
             const room = rooms[index]
-            room.players[socket.id] = {
-                color : "black"
+            room.players[socket.data.username] = {
+                color : "black",
+                username : socket.data.username
             }
 
             room.open = false
@@ -45,8 +46,9 @@ const gameHandler = (
             const room = {
                 ID : shortid.generate(),
                 players : {
-                    [socket.id] : {
-                        color : "white"
+                    [socket.data.username] : {
+                        color : "white",
+                        username : socket.data.username,
                     }
                 },
                 game : [
@@ -57,7 +59,7 @@ const gameHandler = (
                     [piece("empty",""),piece("empty",""),piece("empty",""),piece("empty",""),piece("empty",""),piece("empty",""),piece("empty",""),piece("empty","")],
                     [piece("empty",""),piece("empty",""),piece("empty",""),piece("empty",""),piece("empty",""),piece("empty",""),piece("empty",""),piece("empty","")],
                     [piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white"),piece("pawn","white")],
-                    [piece("rook","white"),piece("knight","white"),piece("bishop","white"),piece("king","white"),piece("queen","white"),piece("bishop","white"),piece("knight","white"),piece("rook","white")],
+                    [piece("rook","white"),piece("knight","white"),piece("bishop","white"),piece("queen","white"),piece("king","white"),piece("bishop","white"),piece("knight","white"),piece("rook","white")],
                 ],
                 turn : "white",
                 open : true,

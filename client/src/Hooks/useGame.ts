@@ -1,71 +1,54 @@
 import { useEffect, useState , useRef } from "preact/hooks"
-import { opposite_colors } from "./useSharedGame"
 import { Socket, io } from "socket.io-client"
+import type {piece,piece_type} from "../utils/types"
 
-type piece_type = "king" | "empty" | "queen" | "rook" | "knight" | "bishop" | "pawn"
+import { socket } from "../signals/SocketSignal"
 
-type piece = {
-    type : piece_type,
-    canMove : boolean,
-    color : "white" | "black",
-    selected : boolean,
-    firstTime : boolean
+const opposite_colors = {
+    "black" : "white",
+    "white" : "black"
 }
 
-export const empty = {
+const empty : piece = {
     type : "empty",
-    canMove : false,
     color : "",
+    canMove : false,
     selected : false,
     firstTime : false
 }
 
-const piece = (
-    type : piece_type,
-    color : "white" | "black"
-) => {
-    return{
-        type,
-        canMove : false,
-        color,
-        selected : false,
-        firstTime : type === "pawn",
-    }
-}
-
 export const useGame = () => {
-    const [game,setGame] = useState<piece[][] | typeof empty[][]>([[]])
-    const [socket,setSocket] = useState<null | Socket>(null)
+    const [game,setGame] = useState<piece[][]>([[]])
     const [roomID , setRoomID] = useState<string | null>(null)
     const [color,setColor] = useState<"white" | "black">("white")
     const [turn,setTurn] = useState<"white" | "black">("white")
     const [loading,setLoading] = useState(true)
+    const [players , setPlayers] = useState<{color : "white" | "black",username : string}[] | []>([])
 
     useEffect(() => {
-    const socket = io(import.meta.env.VITE_SOCKET_URL)
+        socket?.value?.emit("room:create","",() => {})
 
-    socket.on("connect",() => {
-        setSocket(socket)
-
-        socket.emit("room:create","",() => {})
-
-        socket.on("room:get",(room) =>{
-            const color = room.players[socket.id].color
+        socket?.value?.on("room:get",(room) =>{
+            const color = room.players[socket?.value?.auth.username || ""].color
             setColor(color)
-
-            console.log(room)
 
             if(!roomID) setRoomID(room.ID)
 
             setTurn(room.turn)
 
+            
+
             if(color === "white"){
             setGame([...room.game])
-            return
+            } else {
+            setGame([...room.game].map((_,p_idx,p_arr) => [...p_arr[(p_arr.length - p_idx) - 1].map((_ : piece,idx : number,arr : piece[]) => arr[arr.length - idx - 1])]))
             }
-            setGame([...room.game].map((_,p_idx,p_arr) => [...p_arr[(p_arr.length - p_idx) - 1].map((_,idx,arr) => arr[arr.length - idx - 1])]))
+
+            if(!room.open && loading){
+                setPlayers(Object.values(room.players))
+                setLoading(false)
+            }
         })
-    })
     },[])
     
 
@@ -368,7 +351,7 @@ export const useGame = () => {
                     arr[arr.length - idx - 1])]
                     ).map((i) => [...i.map((v) => { return {...v , selected : false , canMove : false}})])
         }
-        socket?.emit("room:update",{
+        socket.value?.emit("room:update",{
             ID : roomID,
             game : array
         })
@@ -391,7 +374,9 @@ export const useGame = () => {
             bishop_move_areas,
             knight_move_areas,
             share_game
-        }
+        },
+        loading,
+        players
     }
 
 }
