@@ -27,6 +27,11 @@ const gameHandler = (
         payload,
         cb
     ) => {
+        const idx = rooms.findIndex(room => !!room.players[socket.data.username]);
+        console.log(idx)
+        
+        if(idx >= 0) return
+
         const index = rooms.findIndex(room => room.open === true)
 
         if(index >= 0){
@@ -73,14 +78,43 @@ const gameHandler = (
     }
 
     const update = (
-        payload
+        {game , ID}
     ) => {
-        const idx = rooms.findIndex(room => room.ID === payload.ID);
-        const room = rooms[idx];
-        room.game = payload.game
-        room.turn = opposite_color[room.turn]
+        const black_king = game.some(row => row.some(item => item.type === "king" && item.color === "black"))
+        const white_king = game.some(row => row.some(item => item.type === "king" && item.color === "white"))
+        if(black_king && white_king){
+            const idx = rooms.findIndex(room => room.ID === ID);
+            const room = rooms[idx];
+            room.game = game
+            room.turn = opposite_color[room.turn]
 
-        io.to(payload.ID).emit("room:get",room)
+            io.to(ID).emit("room:get",room)
+        }
+        else{
+            if(!black_king){
+                io.to(ID).emit("room:over",{
+                    winner : "white",
+                    game
+                })
+            }
+
+            else {
+                io.to(ID).emit("room:over",{
+                    winner : "black",
+                    game
+                })
+
+                io.of('/').in(ID).clients((error, socketIds) => {
+                    if (error) throw error;
+                  
+                    socketIds.forEach(socketId => io.sockets.sockets[socketId].leave('chat'));
+                  
+                  });
+            }
+            
+            const idx = rooms.findIndex((room) => room.ID === ID)
+            rooms.splice(idx,1)
+        }
     }
 
     socket.on("room:create",create)

@@ -3,7 +3,6 @@ const { createServer } = require("http");
 const express = require("express");
 const { Server } = require("socket.io");
 const gameHandler  = require("./src/gameHandler");
-const { disconnect } = require("process");
 
 dotenv.config()
 
@@ -23,16 +22,16 @@ const users = []
 
 io.use((socket,next) => {
     const {username , password} = socket.handshake.auth;
+    const idx = users.findIndex((user) => user.username === username);
     
-    const idx = users.findIndex((user) => user.name === username);
-
     if(idx >= 0){
         const user = users[idx]
         if(user.password === password){
             socket.data = {...user}
             next()
+        } else {
+            return
         }
-        next(new Error("wrong password bro!"))
     } else {
         const user = {
             username,

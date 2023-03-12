@@ -39,7 +39,7 @@ type props = {
         knight_move_areas: (x_idx: number, y_idx: number) => void;
         share_game: () => void;
     },
-    color : "white" | "black",
+    color : "white" | "black" | "",
     turn : "white" | "black",
 }
 

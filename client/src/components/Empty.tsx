@@ -17,7 +17,7 @@ type props = {
         color : "white" | "black" | ""
     },
     turn : "white" | "black",
-    color : "white" | "black"
+    color : "white" | "black" | ""
 }
 
 const Empty : Preact.FunctionComponent<props> = ({

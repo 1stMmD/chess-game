@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 import Table from './components/Table'
 import { socket, socket_error } from './signals/SocketSignal'
 import { 
@@ -34,6 +34,7 @@ const Game = () => {
         <Routes>
 
           <Route path="/play" element={<AuthProtected><Play/></AuthProtected>} />
+          <Route path="/play/:id" element={<AuthProtected><Play/></AuthProtected>} />
 
           <Route path="/" element={<AuthProtected><Home/></AuthProtected>} />
           
