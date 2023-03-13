@@ -12,7 +12,8 @@ const Play = () => {
     turn , 
     loading,
     players,
-    winner
+    winner,
+    replacement
   } = useGame()
 
 
@@ -55,6 +56,7 @@ const Play = () => {
           functions={functions}
           color={color}
           turn={turn}
+          replacement={replacement?.replace || false}
           />
 
           <span

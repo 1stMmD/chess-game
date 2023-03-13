@@ -107,7 +107,7 @@ const gameHandler = (
                 io.of('/').in(ID).clients((error, socketIds) => {
                     if (error) throw error;
                   
-                    socketIds.forEach(socketId => io.sockets.sockets[socketId].leave('chat'));
+                    socketIds.forEach(socket => socket.leave(ID));
                   
                   });
             }

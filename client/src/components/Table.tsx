@@ -2,27 +2,13 @@ import Preact from 'preact'
 import { useState } from 'preact/hooks'
 import Pawn from './Pawn'
 import Empty from './Empty'
-import { useGame } from '../hooks/useGame'
 import { piece } from '../utils/types'
+import ChosePiece from './ChosePiece'
 
 export const empty = {
     type : "empty",
     canMove : false,
     color : "",
-    selected : false
-}
-
-const pawn = {
-    type : "pawn",
-    canMove : false,
-    color : "white",
-    selected : false
-}
-
-const pawnBlack = {
-    type : "pawn",
-    canMove : false,
-    color : "black",
     selected : false
 }
 
@@ -38,13 +24,15 @@ type props = {
         bishop_move_areas: (x_idx: number, y_idx: number) => void;
         knight_move_areas: (x_idx: number, y_idx: number) => void;
         share_game: () => void;
+        change_piece: (v : string | "queen" | "bishop" | "rook" | "knight") => void;
     },
     color : "white" | "black" | "",
     turn : "white" | "black",
+    replacement : boolean
 }
 
 const Table : Preact.FunctionComponent<props> = ({
-    game , functions , color , turn
+    game , functions , color , turn , replacement
 }) => {
       
     return (
@@ -72,7 +60,6 @@ const Table : Preact.FunctionComponent<props> = ({
                             case "pawn" :
                                 return(
                                     <Pawn
-                                    share_game={functions.share_game}
                                     color={color}
                                     turn={turn}
                                     key={p_idx + idx}
@@ -91,7 +78,6 @@ const Table : Preact.FunctionComponent<props> = ({
                             case "king" :
                                 return(
                                     <Pawn
-                                    share_game={functions.share_game}
                                     color={color}
                                     turn={turn}
                                     key={p_idx + idx}
@@ -110,7 +96,6 @@ const Table : Preact.FunctionComponent<props> = ({
                             case "rook" :
                                 return(
                                     <Pawn
-                                    share_game={functions.share_game}
                                     color={color}
                                     turn={turn}
                                     key={p_idx + idx}
@@ -129,7 +114,6 @@ const Table : Preact.FunctionComponent<props> = ({
                             case "bishop" :
                                 return(
                                     <Pawn
-                                    share_game={functions.share_game}
                                     color={color}
                                     turn={turn}
                                     key={p_idx + idx}
@@ -148,7 +132,6 @@ const Table : Preact.FunctionComponent<props> = ({
                             case "queen" :
                                 return(
                                     <Pawn
-                                    share_game={functions.share_game}
                                     color={color}
                                     turn={turn}
                                     key={p_idx + idx}
@@ -167,7 +150,6 @@ const Table : Preact.FunctionComponent<props> = ({
                             case "knight" :
                                 return(
                                     <Pawn
-                                    share_game={functions.share_game}
                                     color={color}
                                     turn={turn}
                                     key={p_idx + idx}
@@ -188,7 +170,6 @@ const Table : Preact.FunctionComponent<props> = ({
                             default : 
                              return(
                                 <Empty
-                                share_game={functions.share_game}
                                 color={color}
                                 turn={turn}
                                 any_selected={() => functions.any_selected()}
@@ -205,6 +186,16 @@ const Table : Preact.FunctionComponent<props> = ({
                 </div>
             )
         })}
+
+
+        { replacement ?
+            <ChosePiece
+            color={color}
+            change_piece={functions.change_piece}
+            />
+            :
+            <></>
+        }
     </div>
   )
 }

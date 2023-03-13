@@ -14,7 +14,6 @@ type props = {
     any_selected : () => boolean,
     clean_up : () => void,
     pawn_move_areas : () => void,
-    share_game : () => void,
     x_idx : number,
     y_idx : number,
     item : {
@@ -36,7 +35,6 @@ const Pawn : Preact.FunctionComponent<props> = ({
     clean_up,
     move,
     pawn_move_areas,
-    share_game,
     turn,
     color
 }) => {
@@ -48,7 +46,6 @@ const Pawn : Preact.FunctionComponent<props> = ({
         if(item.canMove && any_selected()){
             move()
             clean_up()
-            share_game()
             return
         }
 

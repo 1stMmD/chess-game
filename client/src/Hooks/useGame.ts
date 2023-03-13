@@ -36,6 +36,12 @@ export const useGame = () => {
     const [players , setPlayers] = useState<{color : "white" | "black",username : string}[] | []>([])
     const [winner, setWinner] = useState<null | string>(null)
 
+    const [replacement , setReplacement] = useState<{
+        replace : boolean,
+        x : number,
+        y : number
+    } | null>(null)
+
     useEffect(() => {
         socket?.value?.emit("room:create","",() => {})
 
@@ -92,16 +98,43 @@ export const useGame = () => {
         x_idx : number,
         y_idx : number
     ) => {
-        if(!!winner) return
-        setGame((prev) => {
-            const clone = [...prev]
-            const x =  clone.findIndex(i => i.some(v => v.selected === true))
-            const y =  clone[x].findIndex(i => i.selected === true)
-            clone[x_idx][y_idx] = {...clone[x][y], firstTime : false}
-            clone[x][y] = empty
-            return[...clone]
-        })
+        const clone = [...game]
+
+        const pawn_x =  clone.findIndex(i => i.some(v => v.selected === true && v.type === "pawn"))
+        
+        const x =  clone.findIndex(i => i.some(v => v.selected === true))
+        const y =  clone[x].findIndex(i => i.selected === true)
+        clone[x_idx][y_idx] = {...clone[x][y], firstTime : false}
+        clone[x][y] = empty;
+        setGame([...clone])
+
+        if(pawn_x === 1 && x_idx === 0){
+            setReplacement({
+                replace : true,
+                x : x_idx,
+                y : y_idx
+            })
+            return
+        }
+
+        share_game()
+        
     }
+
+    const change_piece = (
+        piece : string | "queen" | "bishop" | "rook" | "knight"
+    ) => {
+        const clone = [...game]
+        let x = (replacement?.x as number)
+        let y = (replacement?.y as number)
+
+        clone[x][y] = {...clone[x][y],type : (piece as piece_type)}
+
+        setGame([...clone])
+
+        setReplacement(null)
+        share_game()
+    }   
 
     const pawn_move_areas = (
         x_idx : number,
@@ -418,11 +451,13 @@ export const useGame = () => {
             bishop_move_areas,
             knight_move_areas,
             share_game,
-            clear_game
+            clear_game,
+            change_piece
         },
         loading,
         players,
-        winner
+        winner,
+        replacement
     }
 
 }
